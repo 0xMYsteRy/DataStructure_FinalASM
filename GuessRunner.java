@@ -55,7 +55,7 @@ public class GuessRunner {
 		 * should be a random number between [1000-9999]
 		 */
 		HashMap<Integer, List<Integer>> testResult = new HashMap<>();
-		for (int target = 2200; target < 2300; target++) {
+		for (int target = 1000; target < 10000; target++) {
 			Result res = new Result();
 //			System.out.println("Guess\tResponse\n");
 
@@ -81,7 +81,7 @@ public class GuessRunner {
 //				System.out.println("strike " + res.getStrikes() + " hits " + res.getHits());
 		}
 			Guess.refresh();
-			System.out.printf("Target: %d - Number of guesses: %d\n", target, guess_cnt);
+//			System.out.printf("Target: %d - Number of guesses: %d\n", target, guess_cnt);
 			if (!testResult.containsKey(guess_cnt)) {
 				testResult.put(guess_cnt, new ArrayList<>());
 			}
@@ -91,6 +91,11 @@ public class GuessRunner {
 			guess_cnt = 0;
 		}
 		System.out.println(testResult);
+//		for (int i = 1; i < 10; i++) {
+//			if (testResult.containsKey(i)) {
+//				System.out.println(i + " steps : " + testResult.get(i).size() + " numbers");
+//			}
+//		}
 
 	}
 }
