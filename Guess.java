@@ -1,7 +1,6 @@
+import java.lang.annotation.Target;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -14,13 +13,17 @@ import java.util.stream.IntStream;
 public class Guess {
 
 	private static int noOfGuesses = 0;
+
 	private static List<Integer> potentialTargets = IntStream.range(1000, 10000).boxed().collect(Collectors.toList());
+
     // Initialize guess as 1123
-	private static int currentGuess = 1123;
+	private static int currentGuess = 8987;
 
 	public static void refresh() {
-	    currentGuess = 1123;
+	    currentGuess = 8987;
+//        currentGuess = 1012;
         potentialTargets = IntStream.range(1000, 10000).boxed().collect(Collectors.toList());
+//        allTargets = IntStream.range(1000, 10000).boxed().collect(Collectors.toList());
         noOfGuesses = 0;
     }
 	
@@ -38,12 +41,16 @@ public class Guess {
         int maxPartitions = -1;
         int myGuess = -1;
         int numberOfSwapMax = 0;
+        LinkedList<MyTarget> targetListSortByBestToWorst = new LinkedList<>();
+        int mainWorstCase = 0;
+
 
         // Implement Max-Part algorithm (to choose 1 potential target among all potential targets)
         for (int guess: potentialTargets) {
             // Hash map of (result, number of targets that have that result given the guess)
             HashMap<Integer, Integer> resultMap = new HashMap<>();
             int numberOfPartitions = 0;
+            int worstCase = 0;
             for (int target: potentialTargets) {
                 Result result = processGuess(target, guess);
                 int hashKey = hash(result); // Convert result to key
@@ -53,19 +60,47 @@ public class Guess {
                     resultMap.put(hashKey, 0);
                     numberOfPartitions ++;
                 }
-                resultMap.put(hashKey, resultMap.get(hashKey) + 1);
+                int currentCount = resultMap.get(hashKey);
+                resultMap.put(hashKey, ++currentCount);
+                if (currentCount > worstCase) {
+                    worstCase = currentCount;
+                }
             }
 
-            if (numberOfPartitions == 14) { // Reach the maximum number of partitions
-                currentGuess = guess;
-                return guess; // Return the guess has the largest number of partitions
+            MyTarget currentTarget = new MyTarget(guess, worstCase, numberOfPartitions);
+
+            if (targetListSortByBestToWorst.size() == 0) {
+                targetListSortByBestToWorst.add(currentTarget);
+            } else {
+                ListIterator<MyTarget> listIterator = targetListSortByBestToWorst.listIterator();
+                int i = 0;
+                boolean added = false;
+                while (listIterator.hasNext()) {
+                    MyTarget target = listIterator.next();
+                    if (target.worstCase > currentTarget.worstCase) {
+                        targetListSortByBestToWorst.add(i, currentTarget);
+                        added = true;
+                        break;
+                    }
+                    i++;
+                }
+                if (!added) {
+                    targetListSortByBestToWorst.add(i, currentTarget);
+                }
             }
+
+
+//            if (numberOfPartitions == 14) { // Reach the maximum number of partitions
+//                currentGuess = guess;
+//                return guess; // Return the guess has the largest number of partitions
+//            }
             if (numberOfPartitions > maxPartitions){
                 maxPartitions = numberOfPartitions;
                 numberOfSwapMax ++;
-                myGuess = guess;
+//                myGuess = guess;
             }
         }
+
 
         // Handle special case: when all potential targets have the same number of partitions
         if (numberOfSwapMax == 1 && potentialTargets.size() >= 3 && potentialTargets.size() <= 10) {
@@ -96,12 +131,35 @@ public class Guess {
             // If all potential targets have 3 same digits, only 1 digit is different
             if (numberOfMismatch == 1) {
                 myGuess = createSpecialGuess(targets, mismatchPosition);
-
             }
         }
+        if (myGuess == -1)
+        {
+            // Get the number that have the highest number of partitions & the smallest worst case
+            for(MyTarget target : targetListSortByBestToWorst) {
+                if (target.numberOfPartition == maxPartitions) {
+                    myGuess = target.target;
+                    break;
+                }
+            }
+        }
+
         currentGuess = myGuess;
+//        allTargets.remove(currentGuess - 1000);
 		return currentGuess;
 	}
+
+	private static class MyTarget {
+	    int target;
+	    int worstCase;
+	    int numberOfPartition;
+
+        public MyTarget(int target, int worstCase, int numberOfPartition) {
+            this.target = target;
+            this.worstCase = worstCase;
+            this.numberOfPartition = numberOfPartition;
+        }
+    }
 
     static Result processGuess(int target, int guess) {
         char des[] = Integer.toString(target).toCharArray();
@@ -149,7 +207,23 @@ public class Guess {
                 myGuess[i] = remainSolutions.get(0);
                 continue;
             } else if (numberOfDigits == 1) {
-                myGuess[i] = '9';
+                //myGuess[i]  = '9';
+                for (char j = '0'; j < '9'; j++) {
+                    if (!remainSolutions.contains(j)) {
+                        boolean isContain = false;
+                        for (char guess : myGuess) {
+                            if (guess == j) {
+                                isContain = true;
+                                break;
+                            }
+                        }
+                        if (!isContain) {
+                            myGuess[i] = j;
+                            break;
+                        }
+                    }
+                }
+
             } else if (numberOfDigits == 2) {
                 // For the second replacement, replace with the second remain solutions
                 myGuess[i] = remainSolutions.get(1);
@@ -173,7 +247,6 @@ public class Guess {
         List<Integer> targets = new ArrayList<>();
         // Among remaining possible targets, choose those have the same result as the previous guess
         for (int target: potentialTargets) {
-
             Result result = processGuess(target, currentGuess);
             if (result.getStrikes() == strikes && result.getHits() == hits) {
                 targets.add(target);
