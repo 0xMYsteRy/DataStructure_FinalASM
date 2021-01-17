@@ -54,10 +54,12 @@ public class GuessRunner {
 		 * to get a target number for your oponent
 		 * should be a random number between [1000-9999]
 		 */
+		int startTarget = 1000;
+		int endTarget = 10000;
 		HashMap<Integer, List<Integer>> testResult = new HashMap<>();
-		for (int target = 1000; target < 10000; target++) {
+		int target;
+		for (target = startTarget; target < endTarget; target++) {
 			Result res = new Result();
-//			System.out.println("Guess\tResponse\n");
 
 			while(res.getStrikes() < 4) {
 				/* take a guess from user provided class
@@ -69,7 +71,7 @@ public class GuessRunner {
 
 
 				if (guess == -1) {	// user quits
-					System.out.printf("you quit: %d\n", target);
+//					System.out.printf("you quit: %d\n", target);
 					return;
 				}
 				guess_cnt++;
@@ -81,7 +83,7 @@ public class GuessRunner {
 //				System.out.println("strike " + res.getStrikes() + " hits " + res.getHits());
 		}
 			Guess.refresh();
-//			System.out.printf("Target: %d - Number of guesses: %d\n", target, guess_cnt);
+			System.out.printf("Target: %d - Number of guesses: %d\n", target, guess_cnt);
 			if (!testResult.containsKey(guess_cnt)) {
 				testResult.put(guess_cnt, new ArrayList<>());
 			}
@@ -91,11 +93,16 @@ public class GuessRunner {
 			guess_cnt = 0;
 		}
 		System.out.println(testResult);
-//		for (int i = 1; i < 10; i++) {
-//			if (testResult.containsKey(i)) {
-//				System.out.println(i + " steps : " + testResult.get(i).size() + " numbers");
-//			}
-//		}
+		int sum = 0;
+		for (int i = 1; i < 10; i++) {
+			if (testResult.containsKey(i)) {
+				sum += i * testResult.get(i).size();
+				System.out.println(i + " steps : " + testResult.get(i).size() + " numbers");
+			}
+		}
+		double average = sum / ((double) endTarget - startTarget);
+		System.out.println("Average: " + average + " steps");
 
 	}
+
 }
