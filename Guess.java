@@ -5,25 +5,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/*
- * You need to implement an algorithm to make guesses
- * for a 4-digits number in the method make_guess below
- * that means the guess must be a number between [1000-9999]
- * PLEASE DO NOT CHANGE THE NAME OF THE CLASS AND THE METHOD
+/**
+ * Class for the codebreaker
  */
 public class Guess {
-
+    // Variable to save the number of guesses has been made
 	private static int noOfGuesses = 0;
+	// Generate a list ranging from 1000 to 9999
 	private static List<Integer> potentialTargets = IntStream.range(1000, 10000).boxed().collect(Collectors.toList());
-    // Initialize guess as 1123
-	private static int currentGuess = 1123;
+    // Initialize guess as 3478
+	private static int currentGuess = 3478;
 
-	public static void refresh() {
-	    currentGuess = 1123;
-        potentialTargets = IntStream.range(1000, 10000).boxed().collect(Collectors.toList());
-        noOfGuesses = 0;
-    }
-	
+    /**
+     * Main function to make the guess given the number of hits and strikes of the previous guess
+     * @param hits
+     * @param strikes
+     * @return
+     */
 	public static int make_guess(int hits, int strikes) {
 		noOfGuesses ++;
 
@@ -33,7 +31,6 @@ public class Guess {
 		/* ===== If not the first guess ===== */
         // Update list of potential targets
         potentialTargets = filterTargets(strikes, hits);
-//        System.out.println("pos targets left "+ potentialTargets.size());
 
         int maxPartitions = -1;
         int myGuess = -1;
@@ -60,10 +57,11 @@ public class Guess {
                 currentGuess = guess;
                 return guess; // Return the guess has the largest number of partitions
             }
+            // If this target has larger number of partitions than the current max amount
             if (numberOfPartitions > maxPartitions){
-                maxPartitions = numberOfPartitions;
-                numberOfSwapMax ++;
-                myGuess = guess;
+                maxPartitions = numberOfPartitions; // Save the new max
+                numberOfSwapMax ++; // Keep track of the number of swap max
+                myGuess = guess; // Save the guess which has most partitions
             }
         }
 
@@ -77,19 +75,22 @@ public class Guess {
             int numberOfMismatch = 0;
             boolean notSpecial = false;
 
+            // Loop through 4 digits in all possible targets
             for (int i = 0; i < 4 && !notSpecial; i++) {
-                char firstDigit = targets.get(0)[i];
-                boolean isMatch = firstDigit == targets.get(1)[i];
+                char firstDigit = targets.get(0)[i]; // Get the first target
+                boolean isMatch = firstDigit == targets.get(1)[i]; // Check if the first and the second digit is the same
+                // If the first and the second digit is the same
                 if (isMatch) {
+                    // Check the rest digits if they are the same
                     for (int j = 2; j < targets.size() - 1; j++) {
                         if (targets.get(j)[i] != targets.get(j + 1)[i]) {
                             notSpecial = true;
                             break;
                         }
                     }
-                } else {
-                    mismatchPosition = i;
-                    numberOfMismatch += 1;
+                } else { // If not match, the digit at this position is unknown / mismatch with others
+                    mismatchPosition = i; // Save to mismatchPosition
+                    numberOfMismatch += 1; // Count the number of unknown value
                 }
             }
 
@@ -103,6 +104,12 @@ public class Guess {
 		return currentGuess;
 	}
 
+    /**
+     * Process guess and target to get the number of strikes and hits
+     * @param target
+     * @param guess
+     * @return
+     */
     static Result processGuess(int target, int guess) {
         char des[] = Integer.toString(target).toCharArray();
         char src[] = Integer.toString(guess).toCharArray();
@@ -133,15 +140,20 @@ public class Guess {
         return new Result(hits, strikes);
     }
 
+    /**
+     * Create special guess when all possible targets have three same digits which are strikes, and one unknown digit
+     * @param potentialTargets
+     * @param mismatchPosition
+     * @return
+     */
 	private static int createSpecialGuess(List<char[]> potentialTargets, int mismatchPosition) {
         List<Character> remainSolutions = new ArrayList<>();
         for (char[] target: potentialTargets) {
             remainSolutions.add(target[mismatchPosition]);
         }
-
+        // Get the first potential target as a sample
         char[] myGuess = potentialTargets.get(0);
 
-        // Keep track of the number of digits that have taken from the sample target
         int numberOfDigits = 0;
         for (int i = 0; i < myGuess.length; i++) {
             if (i == mismatchPosition) {
@@ -159,29 +171,61 @@ public class Guess {
         return Integer.parseInt(new String(myGuess));
     }
 
+    /**
+     * Convert List of Integer to List of Char Array
+     * Each character represents a digit
+     * @param integers
+     * @return
+     */
     private static List<char[]> convertToCharArrayList(List<Integer> integers) {
         List<char[]> results = new ArrayList<>();
-	    for (int integer: integers) {
+	    for (int integer: integers) { // Loop through each integer
+	        // Convert integer to char array and append result
             results.add(Integer.toString(integer).toCharArray());
         }
 	    return results;
     }
 
 
-	// Function to filter out numbers that are impossible to be the target
+    /**
+     * Function to filter out numbers that are impossible to be the target
+     * @param strikes
+     * @param hits
+     * @return
+     */
 	private static List<Integer> filterTargets (int strikes, int hits) {
         List<Integer> targets = new ArrayList<>();
         // Among remaining possible targets, choose those have the same result as the previous guess
-        for (int target: potentialTargets) {
-
+        for (int target: potentialTargets) { // Loop through all potential targets
+            // Assume that the opponent target is this target, get result when inputting the current guess
             Result result = processGuess(target, currentGuess);
-            if (result.getStrikes() == strikes && result.getHits() == hits) {
+            if (result.getStrikes() == strikes && result.getHits() == hits) { // If the result is the same
+                // This target is a potential one
                 targets.add(target);
             }
         }
         return targets;
     }
 
+    /**
+     * Function to
+     * (0 strike, 0 hit) -> 0
+     * (0 strike, 1 hit) -> 1
+     * (0 strike, 2 hits) -> 2
+     * (0 strike, 3 hits) -> 3
+     * (0 strike, 4 hits) -> 4
+     * (1 strike, 0 hit) -> 5
+     * (1 strike, 1 hit) -> 6
+     * (1 strike, 2 hits) -> 7
+     * (1 strike, 3 hits) -> 8
+     * (2 strikes, 0 hit) -> 9
+     * (2 strikes, 1 hit) -> 10
+     * (2 strikes, 2 hits) -> 11
+     * (3 strikes, 0 hit) -> 12
+     * (4 strikes, 0 hit) -> 13
+     * @param result
+     * @return The hash value for a specific pair of (strikes and hits)
+     */
 	private static int hash(Result result) {
 	    if (result.getStrikes() == 3) return 12;
 	    if (result.getStrikes() == 4) return 13;

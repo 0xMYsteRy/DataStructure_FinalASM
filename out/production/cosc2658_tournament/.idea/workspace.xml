@@ -8,10 +8,22 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\Users\nguye\Desktop\cosc2658_tournament\.idea" />
+      </set>
+    </option>
+  </component>
   <component name="ProjectId" id="1myRiBcO9u3zl0Gpq3TgmfDvAkS" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="ignore.virus.scanning.warn.message" value="true" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -54,11 +66,30 @@
       <workItem from="1610555934452" duration="1240000" />
       <workItem from="1610669311291" duration="1768000" />
       <workItem from="1610691423887" duration="4000" />
-      <workItem from="1610693629653" duration="7163000" />
+      <workItem from="1610693629653" duration="17529000" />
+      <workItem from="1610722845851" duration="4868000" />
+      <workItem from="1610761872275" duration="7273000" />
+      <workItem from="1610801504579" duration="14947000" />
+      <workItem from="1610851352458" duration="9400000" />
+      <workItem from="1610935527922" duration="17000" />
+      <workItem from="1611042298200" duration="4740000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
